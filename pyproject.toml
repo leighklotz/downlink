@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "downlink"
+version = "0.1.0"
+description = "Simple CLI to download files using HTTP(S) with a progress bar."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT License" }
+authors = [
+  { name = "Leigh Klotz", email = "" }
+]
+dependencies = [
+  "requests>=2.31.0",
+  "tqdm>=4.0.0"
+]
+
+[project.scripts]
+downlink = "downlink.cli:main"
