@@ -36,5 +36,4 @@ python -m downlink.cli https://example.com/page
 Notes
 - The implementation uses Playwright to render client-side JS and markdownify to convert HTML to Markdown.
 - Playwright requires an extra step to install browser binaries (`python -m playwright install`). See https://playwright.dev/python/.
-- If you want a headless-browser-free version, we can add a fallback using requests + markdownify.
 ````
