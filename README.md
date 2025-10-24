@@ -41,4 +41,3 @@ downlink -q https://example.com/file.zip
 Notes
 - The project provides a console script entry point `downlink` via setuptools/pyproject.toml.
 - Dependencies are `requests` and `tqdm`.
-- If you'd like automated CI, packaging to PyPI, or additional features (resuming, retries, auth), I can add them.
