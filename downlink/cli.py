@@ -1,116 +1,56 @@
 #!/usr/bin/env python3
-"""
-downlink.cli
+# This is the original Playwright-based implementation adapted as a package entry point.
+# pip install playwright markdownify
+# python -m playwright install
 
-Entry point for the `downlink` console script. Provides a small CLI to download
-one or more URLs with a progress bar (requests + tqdm).
-"""
-from __future__ import annotations
-
-import argparse
 import os
-import sys
-from urllib.parse import urlsplit, unquote
-from typing import List, Optional
+import argparse
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
+from markdownify import markdownify as md
 
-import requests
-from tqdm import tqdm
+USER_AGENT = """Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"""
 
+def fetch_rendered_html(url: str, user_agent: str) -> str:
+    """Fetches the rendered HTML content of a URL using Playwright."""
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(user_agent=user_agent)
+        page = context.new_page()
+        try:
+            page.goto(url, wait_until='domcontentloaded', timeout=10000)
+            page.wait_for_timeout(1000)  # let JS settle
+        except PlaywrightTimeoutError:
+            print(f"Timeout while loading {url}, attempting to extract partial content.")
+        except Exception as e:
+            print(f"Error navigating to {url}: {e}")
+            browser.close()
+            return None
+        content = page.content()
+        browser.close()
+    return content
 
-def _suggest_filename_from_url(url: str) -> str:
-    path = urlsplit(url).path
-    name = os.path.basename(path) or "download"
-    return unquote(name)
+def fetch_and_convert_to_markdown(url, user_agent):
+    """Fetches HTML, renders it with Playwright, and converts to Markdown."""
+    html = fetch_rendered_html(url, user_agent)
+    if html:
+        markdown_text = md(html)
+        return markdown_text
+    else:
+        return None
 
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Convert a webpage to Markdown.")
+    parser.add_argument("url", type=str, help="The URL of the webpage to convert.")
+    parser.add_argument("--user-agent", type=str, help="Optional User Agent header to send.")
+    
+    args = parser.parse_args(argv)
+    
+    user_agent = args.user_agent or os.getenv("USER_AGENT", None) or USER_AGENT
 
-def download_url(url: str, output_path: Optional[str] = None, chunk_size: int = 8192) -> str:
-    """
-    Download `url` and save to `output_path` (if provided) or inferred filename.
-    Returns the path to the saved file.
-    """
-    if output_path is None:
-        fname = _suggest_filename_from_url(url)
-        output_path = os.path.join(os.getcwd(), fname)
+    markdown_text = fetch_and_convert_to_markdown(args.url, user_agent)
 
-    # If output_path is a directory, append filename
-    if os.path.isdir(output_path):
-        fname = _suggest_filename_from_url(url)
-        output_path = os.path.join(output_path, fname)
-
-    # Make sure parent directory exists
-    parent = os.path.dirname(os.path.abspath(output_path)) or "."
-    os.makedirs(parent, exist_ok=True)
-
-    with requests.get(url, stream=True, timeout=10) as r:
-        r.raise_for_status()
-        total = int(r.headers.get("content-length", 0)) if r.headers.get("content-length") else None
-        desc = os.path.basename(output_path)
-        disable_tqdm = os.getenv("TQDM_DISABLE", "0") == "1"
-        with open(output_path, "wb") as f, tqdm(
-            total=total, unit="B", unit_scale=True, unit_divisor=1024, desc=desc, leave=True, disable=disable_tqdm
-        ) as bar:
-            for chunk in r.iter_content(chunk_size=chunk_size):
-                if chunk:
-                    f.write(chunk)
-                    bar.update(len(chunk))
-
-    return output_path
-
-
-def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(prog="downlink", description="Download one or more URLs with a progress bar.")
-    p.add_argument("urls", nargs="+", help="URLs to download")
-    p.add_argument("-o", "--output", help="Output filename (for a single URL) or directory (when downloading multiple files)")
-    p.add_argument("-d", "--dir", dest="directory", help="Directory to save files into (alternative to -o)")
-    p.add_argument("-q", "--quiet", action="store_true", help="Suppress progress output (still saves files)")
-    return p.parse_args(argv)
-
-
-def main(argv: Optional[List[str]] = None) -> int:
-    args = parse_args(argv)
-
-    out = args.output
-    directory = args.directory
-    quiet = args.quiet
-
-    # If output provided and multiple URLs, treat output as directory
-    if out and len(args.urls) > 1:
-        directory = out
-
-    if directory and not os.path.isdir(directory):
-        os.makedirs(directory, exist_ok=True)
-
-    saved_paths = []
-    try:
-        for url in args.urls:
-            if directory:
-                target = directory
-            elif out and len(args.urls) == 1:
-                target = out
-            elif out and len(args.urls) > 1:
-                target = out
-            else:
-                target = None
-
-            if quiet:
-                os.environ["TQDM_DISABLE"] = "1"
-
-            saved = download_url(url, output_path=target)
-            saved_paths.append(saved)
-
-            if quiet and "TQDM_DISABLE" in os.environ:
-                del os.environ["TQDM_DISABLE"]
-
-        for path in saved_paths:
-            print(path)
-        return 0
-    except KeyboardInterrupt:
-        print("Download cancelled.", file=sys.stderr)
-        return 2
-    except Exception as exc:
-        print(f"Error: {exc}", file=sys.stderr)
-        return 1
-
+    if markdown_text:
+        print(markdown_text)
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

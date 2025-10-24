@@ -14,6 +14,9 @@ python -m pip install --upgrade pip setuptools wheel
 echo "Installing package locally (pip install .)..."
 pip install .
 
+echo "Installing Playwright browser binaries (this step is required)..."
+python -m playwright install
+
 echo "Done. To activate the virtual environment, run:"
 echo "  source ${VENV_DIR}/bin/activate"
 echo "Then run the CLI with the `downlink` command."

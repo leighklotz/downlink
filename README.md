@@ -1,16 +1,17 @@
+````markdown
 # downlink
 
-Simple CLI to download files using HTTP(S) with a progress bar.
+Playwright-based CLI to render a webpage and convert its rendered HTML to Markdown.
 
-Quick usage (pip-installable package)
+Quickstart
 
-1. Clone:
+1. Clone the repo:
 ```bash
-git clone <repo-url>
-cd <repo-directory>
+git clone https://github.com/leighklotz/downlink.git
+cd downlink
 ```
 
-2. Create a virtual environment and install the package locally:
+2. Create a virtual environment and install the package:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
@@ -18,26 +19,22 @@ pip install --upgrade pip
 pip install .
 ```
 
-You can also install in editable/development mode:
+3. Install Playwright browser binaries:
 ```bash
-pip install -e .
+python -m playwright install
 ```
 
-3. Run the CLI:
+4. Run:
 ```bash
-# download a single file
-downlink https://example.com/file.zip
+# Convert a page to markdown and print to stdout
+downlink https://example.com/page
 
-# download multiple files into a directory
-downlink -d downloads https://example.com/file1 https://example.com/file2
-
-# save a single URL to a specific filename
-downlink -o myfile.bin https://example.com/file.bin
-
-# suppress progress output (still prints saved path)
-downlink -q https://example.com/file.zip
+# Or use the module directly
+python -m downlink.cli https://example.com/page
 ```
 
 Notes
-- The project provides a console script entry point `downlink` via setuptools/pyproject.toml.
-- Dependencies are `requests` and `tqdm`.
+- The implementation uses Playwright to render client-side JS and markdownify to convert HTML to Markdown.
+- Playwright requires an extra step to install browser binaries (`python -m playwright install`). See https://playwright.dev/python/.
+- If you want a headless-browser-free version, we can add a fallback using requests + markdownify.
+````
