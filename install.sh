@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -euo
+
+SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE}")")"
+
+BINDIR=$1
+
+if [ -z "$BINDIR" ] ; then
+    echo "specify BINDIR"
+    exit 1
+fi
 
 VENV_DIR=".venv"
 
@@ -25,10 +34,13 @@ else
   python -m playwright install
 fi
 
-echo "Done. To activate the virtual environment, run:"
-echo "  source ${VENV_DIR}/bin/activate"
-echo "Then run the CLI with the 'downlink' command, e.g."
-echo "  downlink https://example.com/page"
+#echo "Done. To activate the virtual environment, run:"
+#echo "  source ${VENV_DIR}/bin/activate"
+
+ln -s "${SCRIPT_DIR}/scripts/downlink" "${BINDIR}"
 
 echo "If you want to install in editable/develop mode instead, run inside the venv:"
 echo "  pip install -e ."
+
+echo "Run the CLI with the 'downlink' command, e.g."
+echo "  ${BINDIR}/downlink https://example.com/page"

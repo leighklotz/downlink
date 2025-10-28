@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT License" }
 authors = [
-  { name = "Leigh Klotz", email = "" }
+  { name = "Leigh Klotz", email = "klotz@klotz.me" }
 ]
 dependencies = [
   "playwright>=1.40.0",
