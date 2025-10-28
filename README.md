@@ -22,14 +22,9 @@ What install.sh does
 - installs the package locally (pip install .)
 - runs Playwright browser installation (python -m playwright install, preferring --with-deps when available)
 
-After the script completes the venv is created and Playwright browsers are installed. To re-enter the environment later:
-```bash
-source .venv/bin/activate
-```
-
 Run the CLI:
 ```bash
-downlink https://example.com/page
+$ downlink https://example.com/page
 ```
 
 Developer notes
