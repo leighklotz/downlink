@@ -12,8 +12,7 @@ cd downlink
 
 2. Make the installer executable and run it:
 ```bash
-chmod +x install.sh
-./install.sh
+./install.sh ~/.local/bin
 ```
 
 What install.sh does
