@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo
+set -eu
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE}")")"
 
@@ -7,6 +7,12 @@ BINDIR=$1
 
 if [ -z "$BINDIR" ] ; then
     echo "specify BINDIR"
+    exit 1
+fi
+
+# Check if $bindir/downlink exists and error out if it does.
+if [ -e "${BINDIR}/downlink" ]; then
+    echo "Error: ${BINDIR}/downlink already exists."
     exit 1
 fi
 
@@ -22,8 +28,8 @@ source "${VENV_DIR}/bin/activate"
 echo "Upgrading pip, setuptools, wheel..."
 python -m pip install --upgrade pip setuptools wheel
 
-echo "Installing package locally (pip install .)..."
-pip install .
+echo "Installing package locally (pip install -e .)..."
+pip install -e .
 
 echo "Installing Playwright browsers..."
 # Try recommended install with deps; fall back to default if unavailable
@@ -34,13 +40,6 @@ else
   python -m playwright install
 fi
 
-#echo "Done. To activate the virtual environment, run:"
-#echo "  source ${VENV_DIR}/bin/activate"
-
 ln -s "${SCRIPT_DIR}/scripts/downlink" "${BINDIR}"
-
-echo "If you want to install in editable/develop mode instead, run inside the venv:"
-echo "  pip install -e ."
-
 echo "Run the CLI with the 'downlink' command, e.g."
 echo "  ${BINDIR}/downlink https://example.com/page"

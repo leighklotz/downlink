@@ -3,6 +3,9 @@
 venv/
 ENV/
 
+# Hallux
+hallux
+
 # Python cache
 __pycache__/
 *.py[cod]
