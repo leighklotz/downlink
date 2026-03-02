@@ -2,7 +2,7 @@
 
 Playwright-based CLI to render a webpage and convert its rendered HTML to Markdown.
 
-Quickstart (one-step installer)
+# Quickstart (one-step installer)
 
 1. Clone the repo:
 ```bash
@@ -15,19 +15,22 @@ cd downlink
 ./install.sh ~/.local/bin
 ```
 
-What install.sh does
+# What install.sh does
 - creates a .venv virtual environment
 - activates it
 - upgrades pip/setuptools/wheel
 - installs the package locally (pip install .)
 - runs Playwright browser installation (python -m playwright install, preferring --with-deps when available)
 
-Run the CLI:
+# Run the CLI:
 ```bash
 $ downlink https://example.com/page
 ```
 
-Developer notes
+# Drop Links
+- if `--drop_links` is specified, it passes  `strip=['a', 'img']` to the `markdownify` function to remove hyperlinks and image links.
+
+# Developer notes
 - Playwright requires browser binaries; install.sh runs the install step automatically.
 - If you prefer editable installs for development:
 ```bash
