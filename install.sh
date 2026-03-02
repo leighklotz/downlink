@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo
+set -eu
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE}")")"
 

@@ -24,4 +24,4 @@ downlink = "downlink.cli:main"
 "Homepage" = "https://github.com/leighklotz/downlink"
 
 [tool.setuptools.packages.find]
-where = ["downlink"]
+where = ["."]
