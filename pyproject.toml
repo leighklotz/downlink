@@ -19,3 +19,9 @@ dependencies = [
 
 [project.scripts]
 downlink = "downlink.cli:main"
+
+[project.urls]
+"Homepage" = "https://github.com/leighklotz/downlink"
+
+[tool.setuptools.packages.find]
+where = ["downlink"]
