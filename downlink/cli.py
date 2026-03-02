@@ -29,25 +29,30 @@ def fetch_rendered_html(url: str, user_agent: str) -> str:
         browser.close()
     return content
 
-def fetch_and_convert_to_markdown(url, user_agent):
+def fetch_and_convert_to_markdown(url, user_agent, drop_links=False):
     """Fetches HTML, renders it with Playwright, and converts to Markdown."""
     html = fetch_rendered_html(url, user_agent)
     if html:
-        markdown_text = md(html)
+        if drop_links:
+            markdown_text = md(html, strip=['a', 'img'])
+        else:
+            markdown_text = md(html)
         return markdown_text
     else:
         return None
 
+## TODO: Add an option to drop hyperlinks and image links
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Convert a webpage to Markdown.")
     parser.add_argument("url", type=str, help="The URL of the webpage to convert.")
     parser.add_argument("--user-agent", type=str, help="Optional User Agent header to send.")
+    parser.add_argument("--drop-links", action="store_true", help="Drop hyperlinks and image links.")
     
     args = parser.parse_args(argv)
     
     user_agent = args.user_agent or os.getenv("USER_AGENT", None) or USER_AGENT
 
-    markdown_text = fetch_and_convert_to_markdown(args.url, user_agent)
+    markdown_text = fetch_and_convert_to_markdown(args.url, user_agent, args.drop_links)
 
     if markdown_text:
         print(markdown_text)
