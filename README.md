@@ -9,10 +9,10 @@ Playwright-based CLI to render a webpage and convert its rendered HTML to Markdo
 
 *   **HTML to Markdown Conversion:**  Reliably converts rendered HTML into clean Markdown.
 *   **Playwright Powered:**  Built on Playwright for accurate rendering, including JavaScript execution.
-*   **Easy Installation:**  Simple one-step installation script.
-*   **Drop Links Option:** Removes hyperlinks and image links for a cleaner output.
+*   **Easy Installation:**  Simple one-step installation scripts provided via `pip` or `uv`.
+*   **Drop Links Option:**  Removes hyperlinks and image links for a cleaner output.
 
-## Quickstart (One-Step Installer)
+## Quickstart (Installation)
 
 1.  **Clone the repository:**
 
@@ -21,19 +21,21 @@ Playwright-based CLI to render a webpage and convert its rendered HTML to Markdo
     cd downlink
     ```
 
-2.  **Run the installer:**
+2.  **Run your preferred installer:**
 
+    You can choose between a standard `pip` installation or a faster installation using `uv`. You must provide a directory where you want the `downlink` command to be symlinked (e.g., `~/.local/bin`).
+
+    ### Option A: Standard Installation (`install-pip.sh`)
+    Recommended if you want all Playwright browsers installed with their system dependencies automatically. This uses standard Python virtual environments.
     ```bash
-    ./install.sh ~/.local/bin
+    ./install-pip.sh ~/.local/bin
     ```
 
-    This script:
-
-    *   Creates a virtual environment (`.venv`)
-    *   Activates the virtual environment
-    *   Upgrades `pip`, `setuptools`, and `wheel`
-    *   Installs `downlink` locally (`pip install .`)
-    *   Downloads and installs necessary Playwright browser binaries (`python -m playwright install`)
+    ### Option B: Fast Installation (`install-uv.sh`)
+    Requires [`uv`](https://github.com/astral-sh/uv) to be installed on your system. This method is significantly faster, installs only Chromium for Playwright, and generates a `requirements.txt` file automatically.
+    ```bash
+    ./install-uv.sh ~/.local/bin
+    ```
 
 ## Usage
 
@@ -43,7 +45,7 @@ Once installed, use `downlink` to convert a webpage to Markdown:
 downlink https://example.com/page
 ```
 
-This will print the Markdown output to your terminal.  To save the output to a file:
+This will print the Markdown output to your terminal. To save the output to a file:
 
 ```bash
 downlink https://example.com/page > output.md
@@ -63,8 +65,14 @@ If you plan to contribute or need an editable install for development:
 
 1.  **Activate the virtual environment:**
 
+    Using standard `pip`:
     ```bash
     source .venv/bin/activate
+    ```
+    Or using `uv` if that was your installation method:
+    ```bash
+    # If you used uv to set up, it is recommended to use uv for dev tasks
+    uv pip install -e .
     ```
 
 2.  **Install in editable mode:**
@@ -75,10 +83,10 @@ If you plan to contribute or need an editable install for development:
 
 ## Troubleshooting
 
-*   **Playwright Browser Errors:** If you encounter errors related to browser binaries, ensure the `install.sh` script completed successfully. Re-running it can resolve missing browser installations. Ensure you have sufficient disk space.
-*   **Virtual Environment Issues:** If you experience problems with the virtual environment, try deleting the `.venv` directory and re-running `install.sh`.
+*   **Playwright Browser Errors:** If you encounter errors related to browser binaries, ensure the installation script completed successfully. Re-running it can resolve missing browser installations. Ensure you have sufficient disk space.
+*   **Virtual Environment Issues:** If you experience problems with the virtual environment, try deleting the `.venv` directory and re-running your chosen install script.
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-```
+
