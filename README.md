@@ -30,6 +30,10 @@ Playwright-based CLI to render a webpage and convert its rendered HTML to Markdo
     ```bash
     ./install-pip.sh ~/.local/bin
     ```
+    or
+    ```bash
+    ./install.sh ./bin
+    ```
 
     ### Option B: Fast Installation (`install-uv.sh`)
     Requires [`uv`](https://github.com/astral-sh/uv) to be installed on your system. This method is significantly faster, installs only Chromium for Playwright, and generates a `requirements.txt` file automatically.
