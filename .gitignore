@@ -1,19 +1,15 @@
 # Virtual environment
-.venv/
-venv/
-ENV/
-
-# Hallux
-hallux
-
-# Python cache
-__pycache__/
+.venv
+venv
+ENV
+.hallux
+env.sh
+__pycache__
 *.py[cod]
 *$py.class
-
-# MacOS
 .DS_Store
 build
+bin
 downlink.egg-info
 *~
 #*#
