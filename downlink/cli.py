@@ -23,38 +23,28 @@ class SpacePreservingConverter(MarkdownConverter):
     def convert_br(self, el, text, *args, **kwargs):
         return "  \n"
 
-def _page_content_with_retry(page, url: str, attempts: int = 3) -> str:
-    """Snapshot page HTML, retrying if the page is still navigating."""
-    last_error = None
-    for attempt in range(attempts):
-        try:
-            # Prefer a settled document before reading content. networkidle can
-            # hang on long-polling sites, so fall back to load/domcontentloaded.
-            try:
-                page.wait_for_load_state("networkidle", timeout=5000)
-            except PlaywrightTimeoutError:
-                try:
-                    page.wait_for_load_state("load", timeout=3000)
-                except PlaywrightTimeoutError:
-                    page.wait_for_load_state("domcontentloaded", timeout=2000)
-            return page.content()
-        except PlaywrightTimeoutError as e:
-            # Load-state waits timed out; still try a content snapshot.
-            last_error = e
-            try:
-                return page.content()
-            except Exception as content_error:
-                last_error = content_error
-        except Exception as e:
-            last_error = e
-            message = str(e).lower()
-            if "navigating" not in message or attempt + 1 >= attempts:
-                break
-            # Brief pause so client-side redirects / meta-refresh can finish.
-            page.wait_for_timeout(500 * (attempt + 1))
-    print(f"Error retrieving content from {url}: {last_error}")
-    return None
+def fetch_and_convert_to_markdown(url, user_agent, drop_links=False):
+    html = fetch_rendered_html(url, user_agent)
+    if not html:
+        return None
 
+    if drop_links:
+        # Initializing the converter and calling convert
+        return SpacePreservingConverter().convert(html)
+    else:
+        from markdownify import markdownify as md
+        return md(html)
+
+def fetch_and_convert_to_markdown(url, user_agent, drop_links=False):
+    html = fetch_rendered_html(url, user_agent)
+    if not html:
+        return None
+
+    if drop_links:
+        return SpacePreservingConverter().convert(html)
+    else:
+        from markdownify import markdownify as md
+        return md(html)
 
 def fetch_rendered_html(url: str, user_agent: str) -> str:
     """Fetches the rendered HTML content of a URL using Playwright."""
@@ -63,19 +53,15 @@ def fetch_rendered_html(url: str, user_agent: str) -> str:
         context = browser.new_context(user_agent=user_agent)
         page = context.new_page()
         try:
-            page.goto(url, wait_until="domcontentloaded", timeout=10000)
-            # Extra settle after the initial document so late redirects finish.
-            try:
-                page.wait_for_load_state("networkidle", timeout=10000)
-            except PlaywrightTimeoutError:
-                page.wait_for_timeout(1000)
+            page.goto(url, wait_until='domcontentloaded', timeout=10000)
+            page.wait_for_timeout(1000)  # let JS settle
         except PlaywrightTimeoutError:
             print(f"Timeout while loading {url}, attempting to extract partial content.")
         except Exception as e:
             print(f"Error navigating to {url}: {e}")
             browser.close()
             return None
-        content = _page_content_with_retry(page, url)
+        content = page.content()
         browser.close()
     return content
 
@@ -91,7 +77,7 @@ def fetch_and_convert_to_markdown(url, user_agent, drop_links=False):
     else:
         from markdownify import markdownify as md
         markdown_text = md(html)
-
+        
     return markdown_text
 
 def main(argv=None):
