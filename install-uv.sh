@@ -3,12 +3,12 @@ set -eu
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE}")")"
 
-BINDIR=$1
-
-if [ -z "$BINDIR" ] ; then
-    echo "specify BINDIR"
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 BINDIR   (e.g. ./install-uv.sh ./bin/)" >&2
     exit 1
 fi
+
+BINDIR="$1"
 
 # Check if $bindir/downlink exists and error out if it does.
 if [ -e "${BINDIR}/downlink" ]; then
